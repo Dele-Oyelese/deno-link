@@ -1,25 +1,13 @@
-import { serveDir } from "@std/http";
+import { Router } from "./router.ts";
+const app = new Router()
 
-const userPagePattern = new URLPattern({ pathname: "/users/:id" });
-const staticPathPattern = new URLPattern({ pathname: "/static/*" });
+app.get('/', () => new Response('hi Mom'))
+app.post('/health-check', () => new Response('ALIVE'))
+
 
 export default {
-  fetch(req) {
-    const url = new URL(req.url);
+fetch(req) {
+  return app.handler(req)
+},
 
-    if (url.pathname === "/") {
-      return new Response("Home page");
-    }
-
-    const userPageMatch = userPagePattern.exec(url);
-    if (userPageMatch) {
-      return new Response(userPageMatch.pathname.groups.id);
-    }
-
-    if (staticPathPattern.test(url)) {
-      return serveDir(req);
-    }
-
-    return new Response("Not found", { status: 404 });
-  },
-} satisfies Deno.ServeDefaultExport;
+} satisfies Deno.ServeDefaultExport
